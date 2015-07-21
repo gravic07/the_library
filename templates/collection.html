@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class='col-sm-8 col-sm-offset-2'>
+            <div class='jumbotron text-center'>
+                <h2>{{ collection.name }}</h2>
+            </div>
+        </div>
+    </div>
+
+    {% for book in books %}
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div class="row well well-lg">
+                <div class="col-sm-3 center-block">
+                    <img src='{{ book.coverImage }}' class="img-responsive">
+                </div>
+                <div class="col-sm-9">
+                    <h3>{{ book.title }} <small>  by {{ book.author }}</small></h3>
+                    <br />
+                    <p>{{ book.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    {% endfor %}
+{% endblock %}
