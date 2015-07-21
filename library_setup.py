@@ -20,6 +20,7 @@ class Collections(Base):
     name = Column(String(80), nullable=False)
     patronID = Column(Integer, ForeignKey('patrons.id'))
     patrons = relationship(Patrons)
+    collectionOfBooks = relationship('Books', cascade='all, delete-orphan')
     # Convert data into JSON format
     @property
     def serialize(self):
@@ -56,6 +57,6 @@ class Books(Base):
             'id'          : self.id,
         }
 
-engine = create_engine('sqlite:///theArchives.db')
+engine = create_engine('postgres://ewcuvsjxbhzuce:lTxnaKjAsx3L5JVCsjN1NXrrnS@ec2-54-83-20-177.compute-1.amazonaws.com:5432/d6l2vgh7udooqv')
 
 Base.metadata.create_all(engine)

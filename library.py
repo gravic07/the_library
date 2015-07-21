@@ -30,8 +30,8 @@ app = Flask(__name__)
 # APPLICATION_NAME = "Restaurants R' Us"
 
 # Create session to talk to database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///theArchives.db'
-engine = create_engine('sqlite:///theArchives.db')
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///theArchives.db'
+engine = create_engine('postgres://ewcuvsjxbhzuce:lTxnaKjAsx3L5JVCsjN1NXrrnS@ec2-54-83-20-177.compute-1.amazonaws.com:5432/d6l2vgh7udooqv')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
@@ -111,7 +111,7 @@ def deleteBook(collectionID, bookID):
 
 
 
-app.secret_key'''
+app.secret_key = '''
     \xa4hH\x8d\xf9\x8f\xd3%\xc1\xa0Kx06]Nx83[\xee\xf7\xa1F0\xd4\xc9\xc6]\xf4
     '''
 app.debug = True
