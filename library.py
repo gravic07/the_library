@@ -24,6 +24,7 @@ import requests
 
 app = Flask(__name__)
 
+
 # 2DO - Establish client id and client secret
 # CLIENT_ID = json.loads(
 #     open('client_secrets.json', 'r').read())['web']['client_id']
@@ -47,6 +48,7 @@ def login():
 
 # R - COLLECTIONS / HOMEPAGE
 @app.route('/')
+@app.route('/collections/')
 def homePage():
     collections = session.query(Collections).all()
     return render_template('index.html', collections=collections)
@@ -61,7 +63,11 @@ def createCollections():
             # 2DO - Change once ability to login is added
             patronID = 1
         )
-        session.add(collection)
+        # 2DO - Crappy way to stop SQLAlchemy from adding the same id value
+        i = 0
+        while i < 100:
+            session.add(collection)
+            i += 1
         session.commit()
         flash(collection.name + ' has been added.')
         return redirect(url_for('homePage'))
@@ -71,12 +77,33 @@ def createCollections():
 # U - COLLECTIONS
 @app.route('/collections/<int:collectionID>/edit/', methods=['GET', 'POST'])
 def editCollections(collectionID):
-    return "This will be the page to edit collection " + str(collectionID) + "."
+    collections = session.query(Collections).all()
+    cToEdit = session.query(Collections).filter_by(id=collectionID).one()
+    oldName = cToEdit.name
+    if request.method == 'POST':
+        cToEdit.name = request.form['name']
+        session.add(cToEdit)
+        session.commit()
+        flash(oldName + " updated to " + cToEdit.name + ".")
+        return redirect(url_for('homePage'))
+    else:
+        return render_template('editCollections.html',
+            collections=collections, cToEdit=cToEdit, oldName=oldName)
 
 # D - COLLECTIONS
 @app.route('/collections/<int:collectionID>/delete/', methods=['GET', 'POST'])
 def deleteCollections(collectionID):
-    return "This will be the page to delete collection " + str(collectionID) + "."
+    collections = session.query(Collections).all()
+    cToDelete = session.query(Collections).filter_by(id=collectionID).one()
+    oldName = cToDelete.name
+    if request.method == 'POST':
+        session.delete(cToDelete)
+        session.commit()
+        flash(oldName + " has been deleted.")
+        return redirect(url_for('homePage'))
+    else:
+        return render_template('deleteCollections.html',
+            collection=collections, cToDelete=cToDelete, oldName=oldName)
 
 
 
@@ -114,7 +141,8 @@ def deleteBook(collectionID, bookID):
 app.secret_key = '''
     \xa4hH\x8d\xf9\x8f\xd3%\xc1\xa0Kx06]Nx83[\xee\xf7\xa1F0\xd4\xc9\xc6]\xf4
     '''
-app.debug = True
 
-# if __name__ == '__main__':
-#     app.run(host = '0.0.0.0', port = 5000)
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run(host = '0.0.0.0', port = 5000)

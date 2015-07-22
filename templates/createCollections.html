@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+{% block title %}Create A Collection{% endblock %}
+
+{% block content %}
+    <div class="row"><!-- Start header -->
+        <div class="col-sm-12">
+            <h3>Enter a name for your new collection:</h3>
+        </div>
+    </div><!-- End header -->
+
+    <div class="row">
+        <div class='col-sm-12'>
+            <form class='form-horizontal' action="{{ url_for('createCollections') }}"
+            method='post' id='newCollection'>
+
+                {% from 'jinjaMacros.html' import textField, sub_canButtonGroup %}
+                {{ textField('name', 'New Collection Name', 'required') }}
+                {{ sub_canButtonGroup('Create', url_for('homePage'), 'Abort') }}
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

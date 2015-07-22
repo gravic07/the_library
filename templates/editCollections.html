@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+{% block title %}Edit {{ oldName }}{% endblock %}
+
+{% block content %}
+    <div class="row"><!-- Start header -->
+        <div class="col-sm-12">
+            <h3>Enter the new name for {{ oldName }}:</h3>
+        </div>
+    </div><!-- End header -->
+
+    <div class="row">
+        <div class='col-sm-12'>
+            <form class='form-horizontal' action="{{ url_for('editCollections', collectionID=cToEdit.id) }}"
+            method='post' id='newCollection'>
+
+                {% from 'jinjaMacros.html' import textField, sub_canButtonGroup %}
+                {{ textField('name', oldName, 'required') }}
+                {{ sub_canButtonGroup('Update', url_for('homePage'), 'Abort') }}
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

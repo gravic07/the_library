@@ -1,0 +1,43 @@
+{# Used for title, author, genre, and cover image #}
+{% macro textField(name, placeHolder, optional) %}
+<div class="row"><!-- START text field -->
+    <div class='col-sm-6'>
+        <div class='form-group'>
+            <input type='text' class="form-control" size='30' name='{{ name }}'
+                placeholder='{{ placeHolder }}' {{ optional }}>
+            </div>
+        </div>
+    </div>
+</div><!-- END text field -->
+{% endmacro %}
+
+{% macro textareaForm(name, placeHolder, form) %}
+<div class="row"><!-- START description text area -->
+    <div class='col-sm-6'>
+        <div class='form-group'>
+            <textarea class="form-control" name='{{ name }}' rows='4' cols='50'
+            placeholder='{{ placeHolder }}'
+            form='{{ form }}'></textarea>
+        </div>
+    </div>
+</div><!-- END description text area -->
+{% endmacro %}
+
+{% macro sub_canButtonGroup(submitText, href, cancelText) %}
+<br />
+<div class='row'><!-- START button group -->
+    <div class='col-sm-6'>
+        <div class='btn-group' role='group'
+          aria-label='Update and Cancel group'>
+            <button type='submit' class='btn btn-default'>
+                {{ submitText }}
+            </button>
+            <a href='{{ href }}' class="btn btn-default"
+              role="button">
+                {{ cancelText }}
+            </a>
+        </div>
+    </div>
+</div><!-- END button group -->
+<br />
+{% endmacro %}

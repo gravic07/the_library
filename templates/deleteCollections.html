@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+{% block title %}Delete {{ oldName }}?{% endblock %}
+
+{% block content %}
+    <div class="row"><!-- Start header -->
+        <div class="col-sm-12">
+            <h3>Are you sure you want to delete {{ oldName }}?</h3>
+        </div>
+    </div><!-- End header -->
+
+    <div class="row">
+        <div class='col-sm-12'>
+            <form class='form-horizontal' action="{{ url_for('deleteCollections', collectionID=cToDelete.id) }}"
+            method='post' id='deleteCollection'>
+
+                {% from 'jinjaMacros.html' import sub_canButtonGroup %}
+                {{ sub_canButtonGroup('Delete', url_for('homePage'), 'Abort') }}
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -10,6 +10,9 @@
         </div>
     </div>
 
+    {% if books %}
+
+
     {% for book in books %}
     <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
@@ -27,4 +30,16 @@
     </div>
     <br />
     {% endfor %}
+
+
+    {% else %}
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div class="row well well-lg text-center">
+                <h4>You haven't added any books yet...</h4>
+                <h4><a href='#'>Try adding one!</a></h4>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
