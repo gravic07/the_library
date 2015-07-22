@@ -63,7 +63,7 @@ def createCollections():
             # 2DO - Change once ability to login is added
             patronID = 1
         )
-        # 2DO - Crappy way to stop SQLAlchemy from adding the same id value
+        # 2DO - Crappy way to stop SQLAlchemy from trying to add the same id value
         i = 0
         while i < 100:
             session.add(collection)
@@ -120,9 +120,32 @@ def showBook(collectionID, bookID):
     return "This page will show book " + str(bookID) + " in collection " + str(collectionID) + "."
 
 # C - BOOKS
-@app.route('/collections/<int:collectionID>/books/create/', methods=['GET', 'POST'])
-def createBook(collectionID):
-    return "This page will create a book in collection " + str(collectionID) + "."
+@app.route('/collections/<int:collectionID>/books/add/', methods=['GET', 'POST'])
+def addBook(collectionID):
+    collections = session.query(Collections).all()
+    currentCollection = session.query(Collections).filter_by(id=collectionID).one()
+    if request.method == 'POST':
+        book = Books(
+            title        = request.form['title'],
+            author       = request.form['author'],
+            genre        = request.form.get('genre'),
+            coverImage   = request.form.get('coverImage'),
+            description  = request.form.get('description'),
+            collectionID = collectionID,
+            # 2DO - Change once ability to login is added
+            patronID     = 1
+        )
+        # 2DO - Crappy way to stop SQLAlchemy from trying to add the same id value
+        i = 0
+        while i < 100:
+            session.add(book)
+            i += 1
+        session.commit()
+        flash(book.title + ' has been added to ' + currentCollection.name + '.')
+        return redirect(url_for('homePage'))
+    else:
+        return render_template('addBook.html',
+            collections=collections, currentCollection=currentCollection)
 
 # U - BOOKS
 @app.route('/collections/<int:collectionID>/books/<int:bookID>/edit/', methods=['GET', 'POST'])
@@ -143,6 +166,6 @@ app.secret_key = '''
     '''
 
 
-# if __name__ == '__main__':
-#     app.debug = True
-#     app.run(host = '0.0.0.0', port = 5000)
+if __name__ == '__main__':
+    app.debug = True
+    app.run(host = '0.0.0.0', port = 5000)
