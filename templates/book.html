@@ -1,33 +1,14 @@
 {% extends 'main.html' %}
-{% block title %}{{ collection.name }}{% endblock %}
-
-{% block extraNavButton %}
-<a href='{{ url_for('addBook', collectionID=collection.id) }}' class="btn btn-default navbar-btn">
-    Add Book
-    <span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
-</a>
-{% endblock %}
+{% block title %}book.title{% endblock %}
 
 {% block content %}
-    {% include 'getFlashed.html' %}
-    <div class="row">
-        <div class='col-sm-8 col-sm-offset-2'>
-            <div class='jumbotron text-center'>
-                <h2>{{ collection.name }}</h2>
-            </div>
-        </div>
-    </div>
 
-    {% if books %}
-
-    {% for book in books %}
     <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
             <div class="row well well-lg">
                 <div class='col-sm-12'>
                     <div class='row'>
                         <div class="col-sm-3 center-block">
-                            {# 2DO - Add backup image incase link is dead #}
                             <img src="{{ book.coverImage }}" onError="this.onerror=null;this.src='{{ url_for('static', filename='img/no_cover.png') }}';" class="img-responsive"/>
                         </div>
                         <div class="col-sm-9">
@@ -52,22 +33,9 @@
         </div>
     </div>
     <br />
-    {% endfor %}
-
-    {% else %}
-    <div class="row">
-        <div class="col-sm-8 col-sm-offset-2">
-            <div class="row well well-lg text-center">
-                <h4>You haven't added any books yet...</h4>
-                <h4><a href='{{ url_for('addBook', collectionID=collection.id) }}'>Try adding one!</a></h4>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
 {% endblock %}
 
 {% block footerContent %}
-{% from 'jinjaMacros.html' import JSON %}
-{{ JSON(url_for('collectionBooksJSON', collectionID=collection.id), 'JSON of Books') }}
+{{ super() }}
 {% endblock %}

@@ -1,13 +1,15 @@
 {# Used for title, author, genre, and cover image #}
-{% macro textField(name, placeHolder, optional) %}
+{% macro textField(addon, name, placeHolder, optional) %}
 <div class="row"><!-- START text field -->
     <div class='col-sm-6'>
-        <div class='form-group'>
+        <div class='input-group'>
+            <span class="input-group-addon" id="basic-addon1">{{ addon }}</span>
             <input type='text' class="form-control" size='30' name='{{ name }}'
                 placeholder='{{ placeHolder }}' {{ optional }}>
         </div>
     </div>
 </div><!-- END text field -->
+<br />
 {% endmacro %}
 
 {% macro textareaForm(name, placeHolder, form) %}
@@ -39,4 +41,17 @@
     </div>
 </div><!-- END button group -->
 <br />
+{% endmacro %}
+
+{% macro JSON(href, buttonText) %}
+<div class='row'>
+    <div class='col-sm-4 col-sm-offset-8 text-right'>
+        <div class="btn-group" role='group' aria-label='Login'>
+            <a href='{{ href }}' class="btn btn-default"
+              role="button">
+                {{ buttonText }}
+            </a>
+        </div>
+    </div>
+</div>
 {% endmacro %}

@@ -14,7 +14,7 @@
             method='post' id='newCollection'>
 
                 {% from 'jinjaMacros.html' import textField, sub_canButtonGroup %}
-                {{ textField('name', 'New Collection Name', 'required') }}
+                {{ textField('Name:', 'name', 'New Collection Name', 'required') }}
                 {{ sub_canButtonGroup('Create', url_for('homePage'), 'Abort') }}
 
             </form>

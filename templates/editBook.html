@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+{% block title %}Edit {{ bToEdit.name }}{% endblock %}
+
+{% block content %}
+    <div class="row"><!-- Start header -->
+        <div class="col-sm-12">
+            <h3>Make the edits for {{ bToEdit.name }}:</h3>
+        </div>
+    </div><!-- End header -->
+
+    <div class="row">
+        <div class='col-sm-12'>
+            <form class='form-horizontal' action="{{ url_for('editBook', collectionID=currentCollection.id, bookID=bookID) }}"
+            method='post' id='editBook'>
+
+                {% from 'jinjaMacros.html' import textField, textareaForm, sub_canButtonGroup %}
+                {{ textField('Title:', 'title', bToEdit.title) }}
+                {{ textField('Author:', 'author', bToEdit.author) }}
+                {{ textField('Genre:', 'genre', bToEdit.genre) }}
+                {{ textField('Image URL:', 'coverImage', bToEdit.coverImage) }}
+                {{ textareaForm('description', bToEdit.description, 'editBook') }}
+                {{ sub_canButtonGroup('Update', url_for('homePage'), 'Abort') }}
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

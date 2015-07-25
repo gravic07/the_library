@@ -52,3 +52,20 @@
         </div>
     </div>
 {% endblock %}
+
+{% block footerContent %}
+<div class='row'>
+    <div class='col-sm-12 text-right'>
+        <div class="btn-group" role='group' aria-label='Login'>
+            <a href='{{ url_for('collectionsJSON') }}' class="btn btn-default"
+              role="button">
+                JSON of Collections
+            </a>
+            <a href='{{ url_for('booksJSON') }}' class="btn btn-default"
+              role="button">
+                JSON of Books
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

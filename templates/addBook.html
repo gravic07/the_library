@@ -4,7 +4,7 @@
 {% block content %}
     <div class="row"><!-- Start header -->
         <div class="col-sm-12">
-            <h3>Enter a name for your new collection:</h3>
+            <h3>Add a new book to {{ currentCollection.name }}:</h3>
         </div>
     </div><!-- End header -->
 
@@ -14,11 +14,11 @@
             method='post' id='newBook'>
 
                 {% from 'jinjaMacros.html' import textField, textareaForm, sub_canButtonGroup %}
-                {{ textField('title', 'The Iliad', 'required') }}
-                {{ textField('author', 'Homer', 'required') }}
-                {{ textField('genre', 'Poetry') }}
-                {{ textField('coverImage', 'URL to Cover Image') }}
-                {{ textareaForm('description', "Dating to the ninth century B.C., Homer’s timeless poem still vividly conveys the horror and heroism of men and gods wrestling with towering emotions and battling amidst devastation and destruction, as it moves inexorably to the wrenching, tragic conclusion of the Trojan War. Renowned classicist Bernard Knox observes in his superb introduction that although the violence of the Iliad is grim and relentless, it coexists with both images of civilized life and a poignant yearning for peace.", 'newBook') }}
+                {{ textField('Title:', 'title', '', 'required') }}
+                {{ textField('Author:', 'author', '', 'required') }}
+                {{ textField('Genre:', 'genre', '') }}
+                {{ textField('Image URL:', 'coverImage', '') }}
+                {{ textareaForm('description', 'Description of book:', 'newBook') }}
                 {{ sub_canButtonGroup('Add', url_for('homePage'), 'Abort') }}
 
             </form>

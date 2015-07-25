@@ -105,19 +105,40 @@ def deleteCollections(collectionID):
         return render_template('deleteCollections.html',
             collection=collections, cToDelete=cToDelete, oldName=oldName)
 
+@app.route('/JSON/')
+@app.route('/collections/JSON/')
+def collectionsJSON():
+    collections = session.query(Collections).all()
+    return jsonify(Collections = [c.serialize for c in collections])
+
+@app.route('/books/JSON/')
+@app.route('/collections/books/JSON/')
+def booksJSON():
+    books = session.query(Books).all()
+    return jsonify(Books = [b.serialize for b in books])
+
+
+
+
+
+
 
 
 # R - BOOKS
 @app.route('/collections/<int:collectionID>/books/')
 def showBooksInCollection(collectionID):
+    collections = session.query(Collections).all()
     collection = session.query(Collections).filter_by(id=collectionID).one()
     books      = session.query(Books).filter_by(collectionID=collectionID).all()
-    return render_template('collection.html', collection=collection, books=books)
+    return render_template('collection.html', collections=collections, collection=collection, books=books)
 
 # R - A BOOK
 @app.route('/collections/<int:collectionID>/books/<int:bookID>/')
 def showBook(collectionID, bookID):
-    return "This page will show book " + str(bookID) + " in collection " + str(collectionID) + "."
+    collections = session.query(Collections).all()
+    collection  = session.query(Collections).filter_by(id=collectionID).one()
+    book        = session.query(Books).filter_by(id=bookID).one()
+    return render_template('book.html', collections=collections, collection=collection, book=book)
 
 # C - BOOKS
 @app.route('/collections/<int:collectionID>/books/add/', methods=['GET', 'POST'])
@@ -142,7 +163,7 @@ def addBook(collectionID):
             i += 1
         session.commit()
         flash(book.title + ' has been added to ' + currentCollection.name + '.')
-        return redirect(url_for('homePage'))
+        return redirect(url_for('showBooksInCollection', collectionID=collectionID))
     else:
         return render_template('addBook.html',
             collections=collections, currentCollection=currentCollection)
@@ -150,12 +171,56 @@ def addBook(collectionID):
 # U - BOOKS
 @app.route('/collections/<int:collectionID>/books/<int:bookID>/edit/', methods=['GET', 'POST'])
 def editBook(collectionID, bookID):
-    return "This page will edit book " + str(bookID) + " in collection " + str(collectionID) + "."
+    collections = session.query(Collections).all()
+    currentCollection = session.query(Collections).filter_by(id=collectionID).one()
+    bToEdit = session.query(Books).filter_by(id=bookID).one()
+    originalTitle = bToEdit.title
+    if request.method == 'POST':
+        if request.form.get('title'):
+            bToEdit.title = request.form['title']
+        if request.form.get('author'):
+            bToEdit.author = request.form['author']
+        if request.form.get('genre'):
+            bToEdit.genre = request.form['genre'],
+        if request.form.get('coverImage'):
+            bToEdit.coverImage = request.form['coverImage']
+        if request.form.get('description'):
+            bToEdit.description = request.form['description']
+        session.add(bToEdit)
+        session.commit()
+        print str(originalTitle)
+        print str(bToEdit.title)
+        if originalTitle == bToEdit.title:
+            flash(bToEdit.title + " has been updated.")
+        else:
+            flash(originalTitle + " has been updated and changed to " + bToEdit.title + ".")
+        return redirect(url_for('showBooksInCollection', collectionID=collectionID))
+    else:
+        return render_template('editBook.html',
+            collection=collections, currentCollection=currentCollection, bToEdit=bToEdit, bookID=bookID)
 
 # D - BOOKS
 @app.route('/collections/<int:collectionID>/books/<int:bookID>/delete/', methods=['GET', 'POST'])
 def deleteBook(collectionID, bookID):
-    return "This page will delete book " + str(bookID) + " in collection " + str(collectionID) + "."
+    collections = session.query(Collections).all()
+    currentCollection = session.query(Collections).filter_by(id=collectionID).one()
+    bToDelete = session.query(Books).filter_by(id=bookID).one()
+    if request.method == 'POST':
+        session.delete(bToDelete)
+        session.commit()
+        flash(bToDelete.title + " has been deleted from " + currentCollection.name)
+        return redirect(url_for('showBooksInCollection', collectionID=collectionID))
+    return render_template('deleteBook.html', collections=collections, currentCollection=currentCollection, bToDelete=bToDelete)
+
+@app.route('/collections/<int:collectionID>/books/JSON/')
+def collectionBooksJSON(collectionID):
+    # I would like to have the query join to Restaurants to display
+    # the name and of the restaurant (can do id now using restaurant_id)
+    books = session.query(Books).filter_by(collectionID=collectionID).all()
+    return jsonify(Books = [b.serialize for b in books])
+
+
+
 
 
 
@@ -166,6 +231,6 @@ app.secret_key = '''
     '''
 
 
-# if __name__ == '__main__':
-#     app.debug = True
-#     app.run(host = '0.0.0.0', port = 5000)
+if __name__ == '__main__':
+    app.debug = True
+    app.run(host = '0.0.0.0', port = 5000)
