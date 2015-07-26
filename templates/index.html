@@ -41,7 +41,9 @@
                         <p>{{ collection.description }}</p>
                         {% for book in books %}
                             {% if book.collectionID == collection.id %}
-                                <img src='{{ book.coverImage }}' height='80em'>
+                            <a href='{{ url_for('showBook', collectionID=collection.id, bookID=book.id) }}'>
+                                <img src='{{ book.coverImage }}' height='80em' onError="this.onerror=null;this.src='{{ url_for('static', filename='img/no_cover.png') }}';" alt="Cover for {{ book.title }}" data-toggle="tooltip" data-placement="top" title="{{ book.title }}"/>
+                            </a>
                             {% endif %}
                         {% endfor %}
                     </div>

@@ -17,7 +17,25 @@
                 {{ textField('Title:', 'title', bToEdit.title) }}
                 {{ textField('Author:', 'author', bToEdit.author) }}
                 {{ textField('Genre:', 'genre', bToEdit.genre) }}
-                {{ textField('Image URL:', 'coverImage', bToEdit.coverImage) }}
+
+
+                <div class="row"><!-- START text field -->
+                    <div class='col-sm-6'>
+                        <div class='input-group'>
+                            <span class="input-group-addon" id="basic-addon1">Image URL:</span>
+                            <input type='text' class="form-control" size='30' name='coverImage'
+                                placeholder='{{ bToEdit.coverImage }}' {{ optional }}>
+                        </div>
+                    </div>
+                    <div class='col-sm-2 text-left'>
+                        <img src='{{ bToEdit.coverImage }}' height='80em' onError="this.onerror=null;this.src='{{ url_for('static', filename='img/no_cover.png') }}';" alt="Cover for {{ bToEdit.title }}" data-toggle="tooltip" data-placement="top" title="{{ bToEdit.title }}"/>
+                    </div>
+                </div><!-- END text field -->
+                <br />
+
+
+                
+
                 {{ textareaForm('description', bToEdit.description, 'editBook') }}
                 {{ sub_canButtonGroup('Update', url_for('homePage'), 'Abort') }}
 
