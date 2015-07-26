@@ -38,11 +38,21 @@
                         </h3>
                     </div>
                     <div class="panel-body">
-                        {{ collection.description }}
+                        <p>{{ collection.description }}</p>
+                        {% for book in books %}
+                            {% if book.collectionID == collection.id %}
+                                <img src='{{ book.coverImage }}' height='80em'>
+                            {% endif %}
+                        {% endfor %}
                     </div>
 
-                    {# 2DO - Only show if logged in #}
                     <div class="panel-footer text-right">
+                        <a href='{{ url_for('showBooksInCollection', collectionID=collection.id) }}'>
+                            View
+                        </a>
+                         -
+
+                        {# 2DO - Only show if logged in #}
                         <a href='{{ url_for('editCollections', collectionID=collection.id) }}'>
                             Edit
                         </a>

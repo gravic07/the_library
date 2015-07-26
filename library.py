@@ -51,7 +51,8 @@ def login():
 @app.route('/collections/')
 def homePage():
     collections = session.query(Collections).all()
-    return render_template('index.html', collections=collections)
+    books = session.query(Books).all()
+    return render_template('index.html', collections=collections, books=books)
 
 # C - COLLECTIONS
 @app.route('/collections/create/', methods=['GET', 'POST'])
