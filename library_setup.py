@@ -18,6 +18,7 @@ class Collections(Base):
     __tablename__ = 'collections'
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
+    description = Column(String(1000))
     patronID = Column(Integer, ForeignKey('patrons.id'))
     patrons = relationship(Patrons)
     collectionOfBooks = relationship('Books', cascade='all, delete-orphan')

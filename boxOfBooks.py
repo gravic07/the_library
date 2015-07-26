@@ -19,9 +19,10 @@ session.commit()
 
 # Young adult collection
 youngAdult = Collections(
-    name     = 'Young Adult Collection',
-    patronID = 1,
-    id       = 1
+    name        = 'Young Adult Collection',
+    description = "A collection of books that every young adult needs to read at least once.",
+    patronID    = 1,
+    id          = 1
 )
 session.add(youngAdult)
 
@@ -75,9 +76,10 @@ session.commit()
 
 # Classic collection
 classics = Collections(
-    name     = 'Classics Collection',
-    patronID = 1,
-    id       = 2
+    name        = 'Classics Collection',
+    description = 'Simply the classics!',
+    patronID    = 1,
+    id          = 2
 )
 session.add(classics)
 

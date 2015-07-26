@@ -105,14 +105,13 @@ def deleteCollections(collectionID):
         return render_template('deleteCollections.html',
             collection=collections, cToDelete=cToDelete, oldName=oldName)
 
-@app.route('/JSON/')
-@app.route('/collections/JSON/')
+@app.route('/collections.json')
 def collectionsJSON():
     collections = session.query(Collections).all()
     return jsonify(Collections = [c.serialize for c in collections])
 
-@app.route('/books/JSON/')
-@app.route('/collections/books/JSON/')
+@app.route('/books.json')
+@app.route('/collections/books.json')
 def booksJSON():
     books = session.query(Books).all()
     return jsonify(Books = [b.serialize for b in books])
@@ -212,7 +211,7 @@ def deleteBook(collectionID, bookID):
         return redirect(url_for('showBooksInCollection', collectionID=collectionID))
     return render_template('deleteBook.html', collections=collections, currentCollection=currentCollection, bToDelete=bToDelete)
 
-@app.route('/collections/<int:collectionID>/books/JSON/')
+@app.route('/collections/<int:collectionID>/books.json')
 def collectionBooksJSON(collectionID):
     # I would like to have the query join to Restaurants to display
     # the name and of the restaurant (can do id now using restaurant_id)
