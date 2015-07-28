@@ -23,10 +23,10 @@
                 <div class='col-sm-6'>
                     <div class='btn-toolbar pull-right' role="toolbar" aria-label='Header Navigation'>
                         <div class='btn-group' role='group' aria-label='Login Button'>
-                            <button class="btn btn-primary navbar-btn" type="button">
+                            <a href='{{ url_for('loginPage') }}' class="btn btn-primary navbar-btn">
                                 Login
                                 <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
-                            </button>
+                            </a>
                         </div>
                         <div class='btn-group' role='group' aria-label='Navigation Button Group'>
                             <a href='{{ url_for('homePage') }}' class="btn btn-default navbar-btn">
