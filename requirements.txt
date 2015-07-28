@@ -22,4 +22,3 @@ urllib3==1.7.1
 wsgiref==0.1.2
 gunicorn
 werkzeug==0.8.3
-flask==0.9
