@@ -40,6 +40,38 @@ session = DBSession()
 
 
 
+# User management functions
+def createUser(login_session):
+    ''' Takes login session as an argument and parses the data to be added to the Patrons table in the database.
+
+    '''
+    newUser = Patrons(name    = login_session['username'],
+                      email   = login_session['email'],
+                      picture = login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(Patrons).filter_by(email = login_session['email']).one()
+    return user.id
+
+def getUser(userID):
+    ''' Takes a user ID as an argument and returns the user associated with that ID.
+    '''
+    user = session.query(Patrons).filter_by(id = userID).one()
+    return user
+
+def getUserID(email):
+    ''' Takes an email as an argument and returns the ID of the user associated to that email address.
+    '''
+    try:
+        user = session.query(Patrons).filter_by(email = email).one()
+        return user.id
+    except:
+        return None
+
+
+
+
+
 # LOGIN
 @app.route('/login/')
 def loginPage():
@@ -105,7 +137,14 @@ def gconnect():
     # Store user info to the login session
     login_session['username'] = data['name']
     login_session['picture']  = data['picture']
-    login_session['email']     = data['email']
+    login_session['email']    = data['email']
+
+    # Check if user exists and if not, add to database
+    userID = getUserID(login_session['email'])
+    if not userID:
+        userID = createUser(login_session)
+    # Add the user's ID to the login session
+    login_session['user_id'] = userID
 
     # 2DO - Update this output to be prettier...
     output = ''
@@ -143,6 +182,7 @@ def gdisconnect():
         # Reset the login_session
         del login_session['credentials']
         del login_session['gplus_id']
+        del login_session['user_id']
         del login_session['username']
         del login_session['email']
         del login_session['picture']
@@ -166,17 +206,33 @@ def gdisconnect():
 def homePage():
     collections = session.query(Collections).all()
     books = session.query(Books).all()
-    return render_template('index.html', collections=collections, books=books)
+    loggedIn = None
+    if 'username' in login_session:
+        loggedIn = login_session['user_id']
+    return render_template('index.html', collections=collections, books=books, loggedIn=loggedIn)
 
 # C - COLLECTIONS
 @app.route('/collections/create/', methods=['GET', 'POST'])
 def createCollections():
     collections = session.query(Collections).all()
+
+
+
+    # Verify the user is logged in.  If not, redirect to login.
+
+    # 2DO - Add value that determines if CRUD functions show on template
+    if 'username' not in login_session:
+        flash('Please log in before creating a collection.')
+        return redirect('/login')
+
+
+
+
     if request.method == 'POST':
         collection = Collections(
             name = request.form['name'],
-            # 2DO - Change once ability to login is added
-            patronID = 1
+            # 2DO - I don't believe login_session['user_id'] has been defined at this point
+            patronID = login_session['user_id']
         )
         # 2DO - Crappy way to stop SQLAlchemy from trying to add the same id value
         i = 0
@@ -195,6 +251,14 @@ def editCollections(collectionID):
     collections = session.query(Collections).all()
     cToEdit = session.query(Collections).filter_by(id=collectionID).one()
     oldName = cToEdit.name
+    # Verify the user is logged in.  If not, redirect to login.
+    if 'username' not in login_session:
+        flash('Please log in before editing a collection.')
+        return redirect('/login')
+    # Redirect to home page if the active user is not the creator of the collection
+    if cToEdit.patronID != login_session['user_id']:
+        flash('Only the creator of ' + cToEdit.name + ' may edit it.')
+        return redirect('/collections')
     if request.method == 'POST':
         cToEdit.name = request.form['name']
         session.add(cToEdit)
@@ -211,6 +275,14 @@ def deleteCollections(collectionID):
     collections = session.query(Collections).all()
     cToDelete = session.query(Collections).filter_by(id=collectionID).one()
     oldName = cToDelete.name
+    # Verify the user is logged in.  If not, redirect to login.
+    if 'username' not in login_session:
+        flash('Please log in before deleting a collection.')
+        return redirect('/login')
+    # Redirect to home page if the active user is not the creator of the collection
+    if cToDelete.patronID != login_session['user_id']:
+        flash('Only the creator of ' + cToDelete.name + ' may delete it.')
+        return redirect('/collections')
     if request.method == 'POST':
         session.delete(cToDelete)
         session.commit()
@@ -244,7 +316,10 @@ def showBooksInCollection(collectionID):
     collections = session.query(Collections).all()
     collection = session.query(Collections).filter_by(id=collectionID).one()
     books      = session.query(Books).filter_by(collectionID=collectionID).all()
-    return render_template('collection.html', collections=collections, collection=collection, books=books)
+    loggedIn = None
+    if 'username' in login_session:
+        loggedIn = login_session['user_id']
+    return render_template('collection.html', collections=collections, collection=collection, books=books, loggedIn=loggedIn)
 
 # R - A BOOK
 @app.route('/collections/<int:collectionID>/books/<int:bookID>/')
@@ -259,6 +334,14 @@ def showBook(collectionID, bookID):
 def addBook(collectionID):
     collections = session.query(Collections).all()
     currentCollection = session.query(Collections).filter_by(id=collectionID).one()
+    # Verify the user is logged in.  If not, redirect to login.
+    if 'username' not in login_session:
+        flash('Please log in before editing a collection.')
+        return redirect('/login')
+    # Redirect to home page if the active user is not the creator of the collection
+    if currentCollection.patronID != login_session['user_id']:
+        flash('Only the creator of ' + currentCollection.name + ' can add books to it.')
+        return redirect('/collections')
     if request.method == 'POST':
         book = Books(
             title        = request.form['title'],
@@ -267,8 +350,8 @@ def addBook(collectionID):
             coverImage   = request.form.get('coverImage'),
             description  = request.form.get('description'),
             collectionID = collectionID,
-            # 2DO - Change once ability to login is added
-            patronID     = 1
+            # 2DO - I don't believe login_session['user_id'] has been defined at this point
+            patronID     = login_session['user_id']
         )
         # 2DO - Crappy way to stop SQLAlchemy from trying to add the same id value
         i = 0
@@ -289,6 +372,14 @@ def editBook(collectionID, bookID):
     currentCollection = session.query(Collections).filter_by(id=collectionID).one()
     bToEdit = session.query(Books).filter_by(id=bookID).one()
     originalTitle = bToEdit.title
+    # Verify the user is logged in.  If not, redirect to login.
+    if 'username' not in login_session:
+        flash('Please log in before editing a book.')
+        return redirect('/login')
+    # Redirect to home page if the active user is not the one that added the book
+    if bToEdit.patronID != login_session['user_id']:
+        flash('Only the user that added ' + bToEdit.title + ' may edit it.')
+        return redirect(url_for('showBooksInCollection', collectionID=collectionID))
     if request.method == 'POST':
         if request.form.get('title'):
             bToEdit.title = request.form['title']
@@ -319,6 +410,14 @@ def deleteBook(collectionID, bookID):
     collections = session.query(Collections).all()
     currentCollection = session.query(Collections).filter_by(id=collectionID).one()
     bToDelete = session.query(Books).filter_by(id=bookID).one()
+    # Verify the user is logged in.  If not, redirect to login.
+    if 'username' not in login_session:
+        flash('Please log in before editing a book.')
+        return redirect('/login')
+    # Redirect to home page if the active user is not the one that added the book
+    if bToDelete.patronID != login_session['user_id']:
+        flash('Only the user that added ' + bToDelete.title + ' may delete it.')
+        return redirect(url_for('showBooksInCollection', collectionID=collectionID))
     if request.method == 'POST':
         session.delete(bToDelete)
         session.commit()

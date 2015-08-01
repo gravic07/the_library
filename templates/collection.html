@@ -2,10 +2,12 @@
 {% block title %}{{ collection.name }}{% endblock %}
 
 {% block extraNavButton %}
+{% if collection.patronID == loggedIn %}
 <a href='{{ url_for('addBook', collectionID=collection.id) }}' class="btn btn-default navbar-btn">
     Add Book
     <span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
 </a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -37,6 +39,7 @@
                             <p>{{ book.description }}</p>
                         </div>
                     </div>
+                    {% if collection.patronID == loggedIn %}
                     <div class='row'>
                         <div class='col-sm-4 col-sm-offset-8'>
                             <a href='{{ url_for('editBook', collectionID=book.collectionID, bookID=book.id) }}'>
@@ -48,6 +51,7 @@
                             </a>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

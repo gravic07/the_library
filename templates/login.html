@@ -6,14 +6,6 @@
 
 {% endblock %}
 
-{# Need to add if statement once login is added #}
-{% block extraNavButton %}
-<a href='{{ url_for('createCollections') }}' class="btn btn-default navbar-btn">
-    Create
-    <span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
-</a>
-{% endblock %}
-
 {% block content %}
 
     {% include 'getFlashed.html' %}

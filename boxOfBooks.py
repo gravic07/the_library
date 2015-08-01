@@ -15,6 +15,14 @@ admin = Patrons(
     id = 1
 )
 session.add(admin)
+
+tester = Patrons(
+    name='testerson',
+    email='tester.testerson@test.com',
+    id = 2
+)
+session.add(tester)
+
 session.commit()
 
 # Young adult collection
@@ -116,6 +124,27 @@ gatsby = Books(
     patronID     = 1
 )
 session.add(gatsby)
+
+
+
+# Classic collection
+testerony = Collections(
+    name        = 'Made by another user!',
+    description = 'Testing to ensure privaleges are working...',
+    patronID    = 2,
+    id          = 3
+)
+session.add(testerony)
+
+testText = Books(
+    title        = 'Test Book',
+    author       = 'Anonomous',
+    genre        = 'Fiction',
+    description  = "This is a test book to ensure that user privaleges are working!",
+    collectionID = 3,
+    patronID     = 2
+)
+session.add(testText)
 
 session.commit()
 

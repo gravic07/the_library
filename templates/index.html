@@ -1,12 +1,14 @@
 {% extends 'main.html' %}
 {% block title %}Home{% endblock %}
 
-{# Need to add if statement once login is added #}
 {% block extraNavButton %}
+{# Show Create button if a user is logged in #}
+{% if loggedIn %}
 <a href='{{ url_for('createCollections') }}' class="btn btn-default navbar-btn">
     Create
     <span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
 </a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -52,9 +54,8 @@
                         <a href='{{ url_for('showBooksInCollection', collectionID=collection.id) }}'>
                             View
                         </a>
+                        {% if collection.patronID == loggedIn %}
                          -
-
-                        {# 2DO - Only show if logged in #}
                         <a href='{{ url_for('editCollections', collectionID=collection.id) }}'>
                             Edit
                         </a>
@@ -62,6 +63,7 @@
                         <a href='{{ url_for('deleteCollections', collectionID=collection.id) }}'>
                             Delete
                         </a>
+                        {% endif %}
                     </div>
 
                 </div>
