@@ -17,6 +17,7 @@
                             <p>{{ book.description }}</p>
                         </div>
                     </div>
+                    {% if collection.patronID == loggedIn %}
                     <div class='row'>
                         <div class='col-sm-4 col-sm-offset-8'>
                             <a href='{{ url_for('editBook', collectionID=book.collectionID, bookID=book.id) }}'>
@@ -28,6 +29,7 @@
                             </a>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

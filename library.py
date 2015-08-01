@@ -327,7 +327,10 @@ def showBook(collectionID, bookID):
     collections = session.query(Collections).all()
     collection  = session.query(Collections).filter_by(id=collectionID).one()
     book        = session.query(Books).filter_by(id=bookID).one()
-    return render_template('book.html', collections=collections, collection=collection, book=book)
+    loggedIn = None
+    if 'username' in login_session:
+        loggedIn = login_session['user_id']
+    return render_template('book.html', collections=collections, collection=collection, book=book, loggedIn=loggedIn)
 
 # C - BOOKS
 @app.route('/collections/<int:collectionID>/books/add/', methods=['GET', 'POST'])
