@@ -55,15 +55,11 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     code = request.data
-    print 2
-
-
     try:
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        print 0
         response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -77,7 +73,6 @@ def gconnect():
         response = make_response(json.dumps(result.get('error')), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print 3
     # Verify that the access token matches the intended user
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
@@ -110,20 +105,56 @@ def gconnect():
     # Store user info to the login session
     login_session['username'] = data['name']
     login_session['picture']  = data['picture']
-    login_session['emai']     = data['email']
+    login_session['email']     = data['email']
 
     # 2DO - Update this output to be prettier...
     output = ''
+    output += '<div class="jumbotron text-center">'
     output += '<h1>Welcome, '
     output += login_session['username']
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style="width:100px; height:100px; border-radius:150px; -webkit-border-radius:150px; -moz-border-radius:150px;"> '
+    output += '</div>'
     flash("You are now logged in as %s!" % login_session['username'])
     return output
 
+# Revoke current token and reset the login_session
+@app.route('/gdisconnect')
+def gdisconnect():
+    credentials = login_session.get('credentials')
+    # 2DO - Why is this 401?  Shouldn't it be 200?
+    if credentials is None:
+        response = make_response(json.dumps('The current user is not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Revoke token through an HTTP GET request
+    access_token = credentials.access_token
+    print "This is the access token:"
+    print access_token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    print "Result status:"
+    print result['status']
+    print result
+    if result['status'] == '200':
+        # Reset the login_session
+        del login_session['credentials']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
 
+        response = make_response(json.dumps('The user has been disconnected'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        # Something went wrong while trying to revoke the token from Google
+        response = make_response(json.dumps("An error occured while trying to revoke the current user's access token"), 400)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 
 
