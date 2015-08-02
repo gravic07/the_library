@@ -80,6 +80,31 @@ def loginPage():
     print state
     return render_template('login.html', STATE=state)
 
+
+
+@app.route('/disconnect')
+def disconnect():
+    if 'provider' in login_sesion:
+        if login_session['provider'] == 'google':
+            gdisconnect()
+            del login_session['credentials']
+            del login_session['gplus_id']
+        if login_session['provider'] == 'facebook':
+            fbdisconnect()
+            del login_session['facebook_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
+        del login_session['provider']
+        flash('You have successfully been logged out.')
+        return redirect(url_for('homePage'))
+    else:
+        flash('You are not currenlty logged in.')
+        return redirect(url_for('homePage'))
+
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     if request.args.get('state') != login_session['state']:
@@ -135,6 +160,7 @@ def gconnect():
     data = json.loads(answer.text)
 
     # Store user info to the login session
+    login_session['provider'] = 'google'
     login_session['username'] = data['name']
     login_session['picture']  = data['picture']
     login_session['email']    = data['email']
@@ -159,7 +185,6 @@ def gconnect():
     flash("You are now logged in as %s!" % login_session['username'])
     return output
 
-# Revoke current token and reset the login_session
 @app.route('/gdisconnect')
 def gdisconnect():
     credentials = login_session.get('credentials')
@@ -170,31 +195,105 @@ def gdisconnect():
         return response
     # Revoke token through an HTTP GET request
     access_token = credentials.access_token
-    print "This is the access token:"
-    print access_token
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print "Result status:"
-    print result['status']
-    print result
     if result['status'] == '200':
-        # Reset the login_session
-        del login_session['credentials']
-        del login_session['gplus_id']
-        del login_session['user_id']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
-
         response = make_response(json.dumps('The user has been disconnected'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
-    else:
-        # Something went wrong while trying to revoke the token from Google
-        response = make_response(json.dumps("An error occured while trying to revoke the current user's access token"), 400)
+
+
+
+
+
+
+
+
+@app.route('/fbconnect', methods=['POST'])
+def fbconnect():
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+    access_token = request.data
+    # Exchange client token for long lived server-side token
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
+    app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    # Use token to get user info from API
+    userinfo_url = 'https://graph.facebook.com/v2.2/me'
+    # Strip expired tag from access token
+    token = result.split("&")[0]
+
+    url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+
+    login_session['provider'] = 'facebook'
+    login_session['username'] = data["name"]
+    login_session['email'] = data["email"]
+    login_session['facebook_id'] = data["id"]
+
+    # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
+    stored_token = token.split("=")[1]
+    login_session['access_token'] = stored_token
+
+    # Get user's picture
+    url = 'https://graph.facebook.com/v2.2/me/picture?%s&redirect=0&height=200&width=200' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+
+    login_session['picture'] = data["data"]["url"]
+
+    # Check if user exists and if not, add to database
+    userID = getUserID(login_session['email'])
+    if not userID:
+        userID = createUser(login_session)
+    # Add the user's ID to the login session
+    login_session['user_id'] = userID
+
+    # 2DO - Update this output to be prettier...
+    output = ''
+    output += '<div class="jumbotron text-center">'
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style="width:100px; height:100px; border-radius:150px; -webkit-border-radius:150px; -moz-border-radius:150px;"> '
+    output += '</div>'
+    flash("You are now logged in as %s!" % login_session['username'])
+    return output
+
+# Revoke current token and reset the login_session
+@app.route('/fbdisconnect')
+def fbdisconnect():
+    facebook_id = login_session['facebook_id']
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    return "You have been logged out."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
