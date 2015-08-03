@@ -22,12 +22,25 @@
                 </div>
                 <div class='col-sm-6'>
                     <div class='btn-toolbar pull-right' role="toolbar" aria-label='Header Navigation'>
+
+
                         <div class='btn-group' role='group' aria-label='Login Button'>
+
+                            {% if 'username' not in session %}
                             <a href='{{ url_for('loginPage') }}' class="btn btn-primary navbar-btn">
                                 Login
                                 <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
                             </a>
+                            {% else %}
+                            <a href='{{ url_for('disconnect') }}' class="btn btn-primary navbar-btn">
+                                Logout
+                                <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+                            </a>
+                            {% endif %}
+
                         </div>
+
+
                         <div class='btn-group' role='group' aria-label='Navigation Button Group'>
                             <a href='{{ url_for('homePage') }}' class="btn btn-default navbar-btn">
                                 Home

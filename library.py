@@ -84,7 +84,7 @@ def loginPage():
 
 @app.route('/disconnect')
 def disconnect():
-    if 'provider' in login_sesion:
+    if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gdisconnect()
             del login_session['credentials']
@@ -108,15 +108,18 @@ def disconnect():
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     if request.args.get('state') != login_session['state']:
+        print "session doesn't match!"
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     code = request.data
     try:
+        print "Check #1"
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
+        print "Flow exchange error."
         response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -124,26 +127,32 @@ def gconnect():
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
     h = httplib2.Http()
+    print "Check #2"
     result = json.loads(h.request(url, 'GET')[1])
     # Abort if there is an error in the access token info
     if result.get('error') is not None:
+        print "There was some kind of error"
         response = make_response(json.dumps(result.get('error')), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Verify that the access token matches the intended user
     gplus_id = credentials.id_token['sub']
+    print "Check #3"
     if result['user_id'] != gplus_id:
+        print "toekn ID doesn't match google id"
         response = make_response(json.dumps("Token's user ID doesn't match given user ID."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Verify that the access token is valid for this app
     if result['issued_to'] != CLIENT_ID:
+        print "client IDs don't match"
         response = make_response(json.dumps("Token's client ID does not match the app's client ID."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Check is user is already logged in
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
+    print "Check #3"
     if stored_credentials is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps('Current user is already logged in.'), 200)
         response.headers['Content-Type'] = 'application/json'
@@ -152,18 +161,21 @@ def gconnect():
     # Store the access token in the session
     login_session['credentials'] = credentials
     login_session['gplus_id'] = gplus_id
+    print "Check #4"
 
     # Get user info
     userinfo_url = 'https://www.googleapis.com/oauth2/v1/userinfo'
     params = {'access_token': credentials.access_token, 'alt':'json'}
     answer = requests.get(userinfo_url, params=params)
     data = json.loads(answer.text)
+    print "Check #5"
 
     # Store user info to the login session
     login_session['provider'] = 'google'
     login_session['username'] = data['name']
     login_session['picture']  = data['picture']
     login_session['email']    = data['email']
+    print "Check #6"
 
     # Check if user exists and if not, add to database
     userID = getUserID(login_session['email'])
@@ -171,6 +183,7 @@ def gconnect():
         userID = createUser(login_session)
     # Add the user's ID to the login session
     login_session['user_id'] = userID
+    print "Check #7"
 
     # 2DO - Update this output to be prettier...
     output = ''
@@ -223,8 +236,6 @@ def fbconnect():
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-    # Use token to get user info from API
-    userinfo_url = 'https://graph.facebook.com/v2.2/me'
     # Strip expired tag from access token
     token = result.split("&")[0]
 
@@ -279,18 +290,6 @@ def fbdisconnect():
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "You have been logged out."
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
