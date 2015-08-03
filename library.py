@@ -316,7 +316,7 @@ def fbdisconnect():
     facebook_id = login_session['facebook_id']
     access_token = login_session['access_token']
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
-    h = httplib2.Http()
+    h = httplib2.Http(disable_ssl_certificate_validation=True)
     result = h.request(url, 'DELETE')[1]
     return "You have been logged out."
 
