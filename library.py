@@ -236,13 +236,15 @@ def fbconnect():
     print "Request data:", request.data
     access_token = request.data
     # Exchange client token for long lived server-side token
-    # app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
-    # app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-
-    app_id = os.environ['FACEBOOK_APP_ID']
-    print "App ID:", app_id
-    app_secret = os.environ['FACEBOOK_SECRET']
-    print "App Secret:", app_secret
+    print "Access Token:", access_token
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
+    print "App ID 1:", app_id
+    app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    print "App Secret 1:", app_secret
+    app_id2 = os.environ['FACEBOOK_APP_ID']
+    print "App ID 2:", app_id2
+    app_secret2 = os.environ['FACEBOOK_SECRET']
+    print "App Secret 2:", app_secret2
 
     print "Check #2"
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
