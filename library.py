@@ -252,6 +252,11 @@ def fbconnect():
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
 
+    print "Check #6"
+    print "Provider:", login_session['provider']
+    print "Username:", login_session['username']
+    print "email:", login_session['email']
+
     # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
@@ -263,6 +268,8 @@ def fbconnect():
     data = json.loads(result)
 
     login_session['picture'] = data["data"]["url"]
+
+    print "picture:", login_session['picture']
 
     # Check if user exists and if not, add to database
     userID = getUserID(login_session['email'])
