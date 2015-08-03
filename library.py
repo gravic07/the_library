@@ -23,7 +23,7 @@ import json
 import requests
 
 app = Flask(__name__)
-
+app.config['DEBUG'] = True
 
 
 CLIENT_ID = json.loads(
@@ -175,9 +175,10 @@ def gconnect():
     login_session['email']    = data['email']
     print "Check #6"
     print "Provider:", login_session['provider']
-    print "Username:", login_session['name']
-    print "picture:", login_session['picture']
-    print "email:", login_session['email']
+    print "Name:", data['name']
+    # print "Username:", login_session['name']
+    # print "picture:", login_session['picture']
+    # print "email:", login_session['email']
 
 
     # Check if user exists and if not, add to database
@@ -256,6 +257,7 @@ def fbconnect():
     # Strip expired tag from access token
     print "Check #3"
     token = result.split("&")[0]
+    print "Token:", token
 
     url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
