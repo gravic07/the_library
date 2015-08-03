@@ -42,8 +42,6 @@ simplejson==3.3.1
 six==1.9.0
 SQLAlchemy==0.8.4
 ssh-import-id==3.21
-Twisted-Names==13.2.0
-Twisted-Web==13.2.0
 urllib3==1.7.1
 wadllib==1.3.2
 Werkzeug==0.8.3
