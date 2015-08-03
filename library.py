@@ -219,25 +219,18 @@ def fbconnect():
     access_token = request.data
 
     # Exchange client token for long lived server-side token
-    # app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
-    # app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    # 2DO - Adjustment from skh
     fb_client_secrets = json.loads(open('fb_client_secrets.json', 'r').read())
     app_id = fb_client_secrets['web']['app_id']
     app_secret = fb_client_secrets['web']['app_secret']
 
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
-    # h = httplib2.Http(disable_ssl_certificate_validation=True)
-    # Let's give this a try...
-    h = httplib2.Http()
+    h = httplib2.Http(disable_ssl_certificate_validation=True)
     result = h.request(url, 'GET')[1]
 
     # Strip expired tag from access token
     token = result.split("&")[0]
 
-    # url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
-    # 2DO - Adjustment from skh
-    url = 'https://graph.facebook.com/v2.2/me?%s&fields=email,name' % token
+    url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
 
