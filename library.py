@@ -282,7 +282,7 @@ def fbconnect():
 
     # Get user's picture
     url = 'https://graph.facebook.com/v2.2/me/picture?%s&redirect=0&height=200&width=200' % token
-    h = httplib2.Http()
+    h = httplib2.Http(disable_ssl_certificate_validation=True)
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
 
