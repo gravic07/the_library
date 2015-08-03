@@ -107,8 +107,10 @@ def disconnect():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    print "Submitted State:", request.args.get('state')
+    print "login session State:", login_session['state']
+
     if request.args.get('state') != login_session['state']:
-        print "session doesn't match!"
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -119,7 +121,6 @@ def gconnect():
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        print "Flow exchange error."
         response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -131,7 +132,6 @@ def gconnect():
     result = json.loads(h.request(url, 'GET')[1])
     # Abort if there is an error in the access token info
     if result.get('error') is not None:
-        print "There was some kind of error"
         response = make_response(json.dumps(result.get('error')), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -139,13 +139,11 @@ def gconnect():
     gplus_id = credentials.id_token['sub']
     print "Check #3"
     if result['user_id'] != gplus_id:
-        print "toekn ID doesn't match google id"
         response = make_response(json.dumps("Token's user ID doesn't match given user ID."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Verify that the access token is valid for this app
     if result['issued_to'] != CLIENT_ID:
-        print "client IDs don't match"
         response = make_response(json.dumps("Token's client ID does not match the app's client ID."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -176,6 +174,11 @@ def gconnect():
     login_session['picture']  = data['picture']
     login_session['email']    = data['email']
     print "Check #6"
+    print "Provider:", login_session['provider']
+    print "Username:", login_session['name']
+    print "picture:", login_session['picture']
+    print "email:", login_session['email']
+
 
     # Check if user exists and if not, add to database
     userID = getUserID(login_session['email'])
