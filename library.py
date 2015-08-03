@@ -260,7 +260,7 @@ def fbconnect():
     print "Token:", token
 
     url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
-    h = httplib2.Http()
+    h = httplib2.Http(disable_ssl_certificate_validation=True)
     result = h.request(url, 'GET')[1]
     print "Check #4"
     data = json.loads(result)
