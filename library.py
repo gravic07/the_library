@@ -107,16 +107,12 @@ def disconnect():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-    print "Submitted State:", request.args.get('state')
-    print "login session State:", login_session['state']
-
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     code = request.data
     try:
-        print "Check #1"
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
@@ -128,7 +124,6 @@ def gconnect():
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
     h = httplib2.Http()
-    print "Check #2"
     result = json.loads(h.request(url, 'GET')[1])
     # Abort if there is an error in the access token info
     if result.get('error') is not None:
@@ -137,7 +132,6 @@ def gconnect():
         return response
     # Verify that the access token matches the intended user
     gplus_id = credentials.id_token['sub']
-    print "Check #3"
     if result['user_id'] != gplus_id:
         response = make_response(json.dumps("Token's user ID doesn't match given user ID."), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -150,7 +144,6 @@ def gconnect():
     # Check is user is already logged in
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
-    print "Check #3"
     if stored_credentials is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps('Current user is already logged in.'), 200)
         response.headers['Content-Type'] = 'application/json'
@@ -159,27 +152,18 @@ def gconnect():
     # Store the access token in the session
     login_session['credentials'] = credentials
     login_session['gplus_id'] = gplus_id
-    print "Check #4"
 
     # Get user info
     userinfo_url = 'https://www.googleapis.com/oauth2/v1/userinfo'
     params = {'access_token': credentials.access_token, 'alt':'json'}
     answer = requests.get(userinfo_url, params=params)
     data = json.loads(answer.text)
-    print "Check #5"
 
     # Store user info to the login session
     login_session['provider'] = 'google'
     login_session['username'] = data['name']
     login_session['picture']  = data['picture']
     login_session['email']    = data['email']
-    print "Check #6"
-    print "Provider:", login_session['provider']
-    print "Name:", data['name']
-    # print "Username:", login_session['name']
-    # print "picture:", login_session['picture']
-    # print "email:", login_session['email']
-
 
     # Check if user exists and if not, add to database
     userID = getUserID(login_session['email'])
@@ -187,7 +171,6 @@ def gconnect():
         userID = createUser(login_session)
     # Add the user's ID to the login session
     login_session['user_id'] = userID
-    print "Check #7"
 
     # 2DO - Update this output to be prettier...
     output = ''
@@ -233,62 +216,46 @@ def fbconnect():
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print "Check #1"
-    print "Request data:", request.data
     access_token = request.data
-    print "Access Token:", access_token
 
     # Exchange client token for long lived server-side token
-    app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
-    print "App ID 1:", app_id
-    app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    print "App Secret 1:", app_secret
+    # app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
+    # app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    # 2DO - Adjustment from skh
+    fb_client_secrets = json.loads(open('fb_client_secrets.json', 'r').read())
+    app_id = fb_client_secrets['web']['app_id']
+    app_secret = fb_client_secrets['web']['app_secret']
 
-
-    print "Check #2"
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
-    h = httplib2.Http(disable_ssl_certificate_validation=True)
+    # h = httplib2.Http(disable_ssl_certificate_validation=True)
+    # Let's give this a try...
+    h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-    print "Result:", result
-
-    # Use token to get user info from API
-    userinfo_url = "https://graph.facebook.com/v2.2/me"
 
     # Strip expired tag from access token
-    print "Check #3"
     token = result.split("&")[0]
-    print "Token:", token
 
-    url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
-    h = httplib2.Http(disable_ssl_certificate_validation=True)
+    # url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
+    # 2DO - Adjustment from skh
+    url = 'https://graph.facebook.com/v2.2/me?%s&fields=email,name' % token
     result = h.request(url, 'GET')[1]
-    print "Check #4"
     data = json.loads(result)
 
     login_session['provider'] = 'facebook'
-    print "Check #5"
     login_session['username'] = data["name"]
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
-
-    print "Check #6"
-    print "Provider:", login_session['provider']
-    print "Username:", login_session['username']
-    print "email:", login_session['email']
 
     # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
 
     # Get user's picture
-    url = 'https://graph.facebook.com/v2.2/me/picture?%s&redirect=0&height=200&width=200' % token
-    h = httplib2.Http(disable_ssl_certificate_validation=True)
+    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
 
     login_session['picture'] = data["data"]["url"]
-
-    print "picture:", login_session['picture']
 
     # Check if user exists and if not, add to database
     userID = getUserID(login_session['email'])
