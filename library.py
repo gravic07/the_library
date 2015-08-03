@@ -232,22 +232,27 @@ def fbconnect():
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+    print "Check #1"
     access_token = request.data
     # Exchange client token for long lived server-side token
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
     app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    print "Check #2"
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     # Strip expired tag from access token
+    print "Check #3"
     token = result.split("&")[0]
 
     url = 'https://graph.facebook.com/v2.2/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
+    print "Check #4"
     data = json.loads(result)
 
     login_session['provider'] = 'facebook'
+    print "Check #5"
     login_session['username'] = data["name"]
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
