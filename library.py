@@ -233,6 +233,7 @@ def fbconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     print "Check #1"
+    print request.data
     access_token = request.data
     # Exchange client token for long lived server-side token
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
