@@ -331,10 +331,12 @@ def createCollections():
                                  patronID = login_session['user_id'])
         # 2DO - Crappy way to stop SQLAlchemy from trying to add duplicate id
         # Commit the new Collections object to the database
-        i = 0
-        while i < 100:
-            session.add(collection)
-            i += 1
+        session.merge(collection)
+
+        # i = 0
+        # while i < 100:
+        #     session.add(collection)
+        #     i += 1
         session.commit()
         flash(collection.name + ' has been added.')
         return redirect(url_for('homePage'))

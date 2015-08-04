@@ -1,3 +1,6 @@
+# The Library v1.0.0
+# Grant Vickers - https://github.com/gravic07
+
 from sqlalchemy import (
     Column, ForeignKey, Integer, String
     )
@@ -7,6 +10,7 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+# Table of all Patrons (users)
 class Patrons(Base):
     __tablename__ = 'patrons'
     id = Column(Integer, primary_key=True)
