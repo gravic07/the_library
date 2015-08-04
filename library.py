@@ -285,7 +285,7 @@ def fbconnect():
     output += '<img src="'
     output += login_session['picture']
     output += ' " style="width:100px; height:100px; border-radius:150px;'
-    output =+ ' -webkit-border-radius:150px; -moz-border-radius:150px;"> '
+    output += ' -webkit-border-radius:150px; -moz-border-radius:150px;"> '
     output += '</div>'
     flash("You are now logged in as %s!" % login_session['username'])
     return output
