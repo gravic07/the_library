@@ -13,8 +13,9 @@
             <form class='form-horizontal' action="{{ url_for('createCollections') }}"
             method='post' id='newCollection'>
 
-                {% from 'jinjaMacros.html' import textField, sub_canButtonGroup %}
+                {% from 'jinjaMacros.html' import textField, textareaForm, sub_canButtonGroup %}
                 {{ textField('Name:', 'name', 'New Collection Name', 'required') }}
+                {{ textareaForm('description', 'Description of collection:', 'newCollection') }}
                 {{ sub_canButtonGroup('Create', url_for('homePage'), 'Abort') }}
 
             </form>

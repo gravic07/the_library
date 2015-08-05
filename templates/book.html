@@ -41,3 +41,19 @@
 {% block footerContent %}
 {{ super() }}
 {% endblock %}
+
+{% block JSON %}
+<div class='row'>
+    <div class='col-sm-12 text-right'>
+        <strong>
+            JSON
+            <span class="glyphicon glyphicon-console" aria-hidden="true"></span>
+            :
+        </strong>
+        <a href='{{ url_for('bookJSON', collectionID=book.collectionID, bookID=book.id) }}'>
+            Book
+        </a>
+    </div>
+</div>
+<br />
+{% endblock %}

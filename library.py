@@ -330,8 +330,10 @@ def createCollections():
         return redirect('/login')
     # Store information as a Collections object
     if request.method == 'POST':
-        collection = Collections(name     = request.form['name'],
-                                 patronID = login_session['user_id'])
+        collection = Collections(
+          name         = request.form['name'],
+          description  = request.form.get('description'),
+          patronID     = login_session['user_id'])
         # Commit the new Collections object to the database
         session.add(collection)
         session.commit()
@@ -348,6 +350,7 @@ def editCollections(collectionID):
     collections = session.query(Collections).all()
     cToEdit = session.query(Collections).filter_by(id=collectionID).one()
     oldName = cToEdit.name
+    oldDesc = cToEdit.description
     # Verify the user is logged in.  If not, redirect to login.
     if 'username' not in login_session:
         flash('Please log in before editing a collection.')
@@ -358,14 +361,18 @@ def editCollections(collectionID):
         return redirect('/collections')
     # Store sumitted changes as a Collections object and submit to DB
     if request.method == 'POST':
-        cToEdit.name = request.form['name']
+        cToEdit.name         = request.form['name']
+        cToEdit.description  = request.form.get('description')
         session.add(cToEdit)
         session.commit()
         flash(oldName + " updated to " + cToEdit.name + ".")
         return redirect(url_for('homePage'))
     else:
         return render_template('editCollections.html',
-            collections=collections, cToEdit=cToEdit, oldName=oldName)
+            collections = collections,
+            cToEdit     = cToEdit,
+            oldName     = oldName,
+            oldDesc     = oldDesc)
 
 
 # Delete a collection
@@ -564,6 +571,13 @@ def deleteBook(collectionID, bookID):
 def collectionBooksJSON(collectionID):
     books = session.query(Books).filter_by(collectionID=collectionID).all()
     return jsonify(Books = [b.serialize for b in books])
+
+
+# JSON endpoint for books in a collection
+@app.route('/collections/<int:collectionID>/books/<int:bookID>.json')
+def bookJSON(collectionID, bookID):
+    book = session.query(Books).filter_by(collectionID=collectionID, id=bookID).one()
+    return jsonify(Book = [book.serialize])
 
 
 # Application secret

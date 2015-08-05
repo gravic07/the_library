@@ -13,8 +13,9 @@
             <form class='form-horizontal' action="{{ url_for('editCollections', collectionID=cToEdit.id) }}"
             method='post' id='newCollection'>
 
-                {% from 'jinjaMacros.html' import textField, sub_canButtonGroup %}
+                {% from 'jinjaMacros.html' import textField, textareaForm, sub_canButtonGroup %}
                 {{ textField('Name:', 'name', oldName, 'required') }}
+                {{ textareaForm('description', oldDesc, 'editCollection') }}
                 {{ sub_canButtonGroup('Update', url_for('homePage'), 'Abort') }}
 
             </form>
