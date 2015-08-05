@@ -64,4 +64,6 @@ class Books(Base):
 
 engine = create_engine('postgres://ewcuvsjxbhzuce:lTxnaKjAsx3L5JVCsjN1NXrrnS@ec2-54-83-20-177.compute-1.amazonaws.com:5432/d6l2vgh7udooqv')
 
+# Create all tables in the declarative base.
 Base.metadata.create_all(engine)
+print "Database setup"

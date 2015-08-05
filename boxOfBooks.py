@@ -1,3 +1,6 @@
+# The Library v1.0.0
+# Grant Vickers - https://github.com/gravic07
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

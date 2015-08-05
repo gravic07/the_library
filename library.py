@@ -329,14 +329,8 @@ def createCollections():
     if request.method == 'POST':
         collection = Collections(name     = request.form['name'],
                                  patronID = login_session['user_id'])
-        # 2DO - Crappy way to stop SQLAlchemy from trying to add duplicate id
         # Commit the new Collections object to the database
-        session.merge(collection)
-
-        # i = 0
-        # while i < 100:
-        #     session.add(collection)
-        #     i += 1
+        session.add(collection)
         session.commit()
         flash(collection.name + ' has been added.')
         return redirect(url_for('homePage'))
@@ -470,12 +464,7 @@ def addBook(collectionID):
             description  = request.form.get('description'),
             collectionID = collectionID,
             patronID     = login_session['user_id'])
-        # 2DO - Crappy way to stop SQLAlchemy from trying to add the same id value
         # Commit the new Books object to the database
-        i = 0
-        while i < 100:
-            session.add(book)
-            i += 1
         session.commit()
         flash(book.title + ' has been added to ' +
                       currentCollection.name + '.')

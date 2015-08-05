@@ -1,7 +1,12 @@
 #The Library
 
 
-This application was created as my submission for project 3 of Udacity's Full Stack NanoDegree program.  The objective of project 3 is to develop a web application that provides a list of items within a variety of categories and to integrate third party user registration and authentication.
+This application was created as my submission for project 3 of Udacity's
+Full Stack Nanodegree program.  The objective of project 3 is to develop a
+web application that provides a list of items within a variety of categories
+ and to integrate third party user registration and authentication.  I
+ decided to make an application called The Library where users can create
+ collections of books to share with their friends.
 
 
 ##Important Files
@@ -11,6 +16,9 @@ This application was created as my submission for project 3 of Udacity's Full St
 | **library_setup.py** | This Python file will create a PostgreSQL database at a specified location. |
 | **boxOfBoxes.py** | A Python file that will populate the The Library with some test data. |
 | **requirements.txt** | Lists all required dependencies for The Library. |
+| **templates Folder** | Stores all HTML templates for the application. |
+| **static Folder** | Stores all dependencies/resources for the HTML templates. |
+
 
 
 ## Installation
@@ -38,18 +46,18 @@ This application was created as my submission for project 3 of Udacity's Full St
   - Other systems: Use your favorite terminal program.
 2. Change to the desired parent directory
   - Example: `cd Desktop/`
-3. Using Git, clone the VM configuration:
+3. Using Git, clone the VM configuration from Udacity:
   - Run: `git clone http://github.com/udacity/fullstack-nanodegree-vm fullstack`
-  - This will create a new directory titled *fullstack* that contains all of the necessary configurations to run this application.
-4. Move to the *vagrant* folder by executing: `cd fullstack/vagrant/`
+  - This will create a new directory titled **fullstack** that contains all of the necessary configurations to run this application.
+4. Move to the **vagrant** folder by executing: `cd fullstack/vagrant/`
 5. Using Git, clone this project:
   - Run: `git clone https://github.com/gravic07/the_library.git the_library`
   - This will create a directory inside the *vagrant* directory titled *the_library*.
 6. Run Vagrant by executing: `vagrant up`
 7. SSH into Vagrant by executing: `vagrant ssh`
-8. Move to the *the_library* directory by executing: `cd /vagrant/the_library/`
-9. Create a local database be executing: 'python library_setup.py'
-  - This will create a PostgreSQL database within the *the_library* directory entitled *bookshelves.psql*
+8. Move to the **the_library** directory by executing: `cd /vagrant/the_library/`
+9. Create a local database be executing: `python library_setup.py`
+  - This will create a PostgreSQL database within the **the_library** directory entitled **bookshelves.psql**
 10. (Optional) Populate the database with some test information by executing: `python boxOfBoxes.py`
 11. Deploy the app by executing: `python library.py`
 
@@ -57,7 +65,7 @@ This application was created as my submission for project 3 of Udacity's Full St
 ## Usage
 Once the installation steps are complete, you are ready to open the application.
 
-1. Open a browser and enter the url *http://localhost:5000*.
+1. Open a browser and enter the url **http://localhost:5000**.
   - If you run into issues at this point, ensure that nothing else is already using port 5000.
 2. The application should now be running and fully functional
 
