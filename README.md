@@ -57,7 +57,7 @@ web application that provides a list of items within a variety of categories
 7. SSH into Vagrant by executing: `vagrant ssh`
 8. Move to the **the_library** directory by executing: `cd /vagrant/the_library/`
 9. Create a local database be executing: `python library_setup.py`
-  - This will create a PostgreSQL database within the **the_library** directory entitled **bookshelves.psql**
+  - This will create a PostgreSQL database within the **the_library** directory entitled **theArchive.db**
 10. (Optional) Populate the database with some test information by executing: `python boxOfBoxes.py`
 11. Deploy the app by executing: `python library.py`
 
@@ -87,7 +87,7 @@ Created by gravic07
 ## License
 Licensed under the MIT License (MIT)
 ```
-Copyright (c) [2015] [gravic07]
+Copyright (c) [2015] [gravicDesign]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
