@@ -139,7 +139,12 @@ def gconnect():
     code = request.data
     try:
         # Create an oauth flow using the client secret information
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+
+        # Used locally and on Heroku
+        # oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+
+        # Used on Apache2 server
+        oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/the_library/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -165,8 +170,14 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     # Read and store the client secrets file
+
+    # Used locally and on Heroku
+    # CLIENT_ID = json.loads(
+    #     open('client_secrets.json', 'r').read())['web']['client_id']
+
+    # Used on Apache2 server
     CLIENT_ID = json.loads(
-        open('client_secrets.json', 'r').read())['web']['client_id']
+        open('/var/www/FlaskApp/the_library/client_secrets.json', 'r').read())['web']['client_id']
     # Verify that the access token is valid for this app
     if result['issued_to'] != CLIENT_ID:
         response = make_response(json.dumps(
@@ -247,7 +258,12 @@ def fbconnect():
         return response
     access_token = request.data
     # Exchange client token for long lived server-side token
-    fb_client_secrets = json.loads(open('fb_client_secrets.json', 'r').read())
+
+    # Used locally and on Heroku
+    # fb_client_secrets = json.loads(open('fb_client_secrets.json', 'r').read())
+
+    # Used on Apache2 server
+    fb_client_secrets = json.loads(open('/var/www/FlaskApp/the_library/fb_client_secrets.json', 'r').read())
     app_id = fb_client_secrets['web']['app_id']
     app_secret = fb_client_secrets['web']['app_secret']
     # Get token from Facebook API
