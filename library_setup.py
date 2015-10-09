@@ -62,7 +62,10 @@ class Books(Base):
             'id'          : self.id,
         }
 
-engine = create_engine('sqlite:///theArchive.db')
+
+# localEngine for use locally; engine for use on Apache2 server
+localEngine = create_engine('sqlite:///theArchive.db')
+engine = create_engine('postgresql://catalog:catalog@localhost/theArchive')
 
 # This engine is used in the application hosted on Heroku
 # http://udacity-p3-the-library.herokuapp.com/
