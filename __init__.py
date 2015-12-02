@@ -44,8 +44,8 @@ engine = create_engine('postgresql://catalog:catalog@localhost/theArchive')
 #                        '@ec2-54-83-20-177.compute-1.amazonaws.com:5432/'
 #                        'd6l2vgh7udooqv')
 
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
+Base.metadata.bind = localEngine
+DBSession = sessionmaker(bind=localEngine)
 session = DBSession()
 
 # Set global variable for sending http requests
@@ -141,10 +141,10 @@ def gconnect():
         # Create an oauth flow using the client secret information
 
         # Used locally and on Heroku
-        # oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        print ":::OAUTH_FLOW = {0}".format(oauth_flow)
         # Used on Apache2 server
-        oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/the_library/client_secrets.json', scope='')
+        # oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/the_library/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -172,12 +172,12 @@ def gconnect():
     # Read and store the client secrets file
 
     # Used locally and on Heroku
-    # CLIENT_ID = json.loads(
-    #     open('client_secrets.json', 'r').read())['web']['client_id']
+    CLIENT_ID = json.loads(
+        open('client_secrets.json', 'r').read())['web']['client_id']
 
     # Used on Apache2 server
-    CLIENT_ID = json.loads(
-        open('/var/www/FlaskApp/the_library/client_secrets.json', 'r').read())['web']['client_id']
+    # CLIENT_ID = json.loads(
+    #     open('/var/www/FlaskApp/the_library/client_secrets.json', 'r').read())['web']['client_id']
     # Verify that the access token is valid for this app
     if result['issued_to'] != CLIENT_ID:
         response = make_response(json.dumps(
@@ -211,6 +211,7 @@ def gconnect():
         userID = createUser(login_session)
     # Add the user's ID to the login session
     login_session['user_id'] = userID
+    print "::: LOGIN_SESSION = {0}".format(login_session)
     # Create output acknowledging successful login
     # 2DO - Update this output to be prettier...
     output = ''
@@ -231,6 +232,7 @@ def gconnect():
 @app.route('/gdisconnect')
 def gdisconnect():
     credentials = login_session.get('credentials')
+    print "::: CREDENTIALS = {0}".format(credentials)
     # If the user is already logged in, return
     if credentials is None:
         response = make_response(json.dumps(
@@ -239,6 +241,7 @@ def gdisconnect():
         return response
     # Revoke token through an HTTP GET request
     access_token = credentials.access_token
+    print "::: ACCESS_TOKEN = {0}".format(access_token)
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
@@ -260,10 +263,10 @@ def fbconnect():
     # Exchange client token for long lived server-side token
 
     # Used locally and on Heroku
-    # fb_client_secrets = json.loads(open('fb_client_secrets.json', 'r').read())
+    fb_client_secrets = json.loads(open('fb_client_secrets.json', 'r').read())
 
     # Used on Apache2 server
-    fb_client_secrets = json.loads(open('/var/www/FlaskApp/the_library/fb_client_secrets.json', 'r').read())
+    # fb_client_secrets = json.loads(open('/var/www/FlaskApp/the_library/fb_client_secrets.json', 'r').read())
     app_id = fb_client_secrets['web']['app_id']
     app_secret = fb_client_secrets['web']['app_secret']
     # Get token from Facebook API

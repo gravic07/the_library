@@ -13,8 +13,8 @@ engine = create_engine('postgresql://catalog:catalog@localhost/theArchive')
 # This engine is used in the application hosted on Heroku
 # http://udacity-p3-the-library.herokuapp.com/
 # engine = create_engine('postgres://ewcuvsjxbhzuce:lTxnaKjAsx3L5JVCsjN1NXrrnS@ec2-54-83-20-177.compute-1.amazonaws.com:5432/d6l2vgh7udooqv')
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
+Base.metadata.bind = localEngine
+DBSession = sessionmaker(bind=localEngine)
 session = DBSession()
 
 # Add test users
