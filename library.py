@@ -100,7 +100,6 @@ def loginPage():
     state = ''.join(random.choice(string.ascii_uppercase +
                                   string.digits) for x in xrange(32))
     login_session['state'] = state
-    print state
     return render_template('login.html', STATE=state)
 
 
@@ -142,7 +141,6 @@ def gconnect():
 
         # Used locally and on Heroku
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-        print ":::OAUTH_FLOW = {0}".format(oauth_flow)
         # Used on Apache2 server
         # oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/the_library/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
@@ -211,7 +209,6 @@ def gconnect():
         userID = createUser(login_session)
     # Add the user's ID to the login session
     login_session['user_id'] = userID
-    print "::: LOGIN_SESSION = {0}".format(login_session)
     # Create output acknowledging successful login
     # 2DO - Update this output to be prettier...
     output = ''
@@ -232,7 +229,6 @@ def gconnect():
 @app.route('/gdisconnect')
 def gdisconnect():
     credentials = login_session.get('credentials')
-    print "::: CREDENTIALS = {0}".format(credentials)
     # If the user is already logged in, return
     if credentials is None:
         response = make_response(json.dumps(
@@ -241,7 +237,6 @@ def gdisconnect():
         return response
     # Revoke token through an HTTP GET request
     access_token = credentials.access_token
-    print "::: ACCESS_TOKEN = {0}".format(access_token)
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
