@@ -66,8 +66,9 @@ def createUser(login_session):
     session.add(newUser)
     session.commit()
     user = session.query(Patrons).filter_by(
-      email = login_session['email']).one()
+        email = login_session['email']).one()
     return user.id
+
 
 def getUser(userID):
     """ Takes a user ID as an argument and returns the user associated
@@ -78,6 +79,7 @@ def getUser(userID):
     """
     user = session.query(Patrons).filter_by(id = userID).one()
     return user
+
 
 def getUserID(email):
     """ Takes an email as an argument and returns the ID of the user
@@ -142,12 +144,13 @@ def gconnect():
         # Used locally and on Heroku
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         # Used on Apache2 server
-        # oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/the_library/client_secrets.json', scope='')
+        # oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/the_library/
+        #   client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(json.dumps(
-          'Failed to upgrade the authorization code.'), 401)
+            'Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Check that the access token is valid
@@ -164,7 +167,7 @@ def gconnect():
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
         response = make_response(json.dumps(
-          "Token's user ID doesn't match given user ID."), 401)
+            "Token's user ID doesn't match given user ID."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Read and store the client secrets file
